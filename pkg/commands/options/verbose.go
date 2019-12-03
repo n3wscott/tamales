@@ -8,6 +8,6 @@ type VerboseOptions struct {
 }
 
 func AddVerboseArg(cmd *cobra.Command, vo *VerboseOptions) {
-	cmd.Flags().BoolVarP(&vo.Verbose, "verbose", "v", false,
+	cmd.Flags().BoolVarP(&vo.Verbose, "verbose", "V", false,
 		"Output more debug info to stderr")
 }

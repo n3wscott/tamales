@@ -5,5 +5,5 @@ import (
 )
 
 func AddTomlesCommands(topLevel *cobra.Command) {
-	addBranch(topLevel)
+	addUpdate(topLevel)
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/n3wscott/tomles/pkg/queue"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -25,6 +26,7 @@ type Update struct {
 type state struct {
 	inConstraint bool
 	match        bool
+	succeeded    bool
 }
 
 func (u *Update) constraint(indent string) string {
@@ -49,7 +51,46 @@ func (u *Update) constraint(indent string) string {
 func (u *Update) Do() error {
 	logger := log.New(os.Stderr, "", 0)
 
-	out := log.New(os.Stdout, "", 0)
+	var out *log.Logger
+
+	now := state{}
+
+	if u.DryRun {
+		out = log.New(os.Stdout, "", 0)
+	} else {
+		tmp, err := ioutil.TempFile("", "tomles-")
+		if err != nil {
+			return err
+		}
+		if u.Verbose {
+			logger.Println("writing to tmp file:", tmp.Name())
+		}
+		tmpOut := bufio.NewWriter(tmp)
+		out = log.New(tmpOut, "", 0)
+
+		defer func() {
+			if err := tmpOut.Flush(); err != nil {
+				logger.Println("failed to flush the tmp file:", err)
+				now.succeeded = false
+			}
+			if err := tmp.Close(); err != nil {
+				logger.Println("failed to close the tmp file:", err)
+				now.succeeded = false
+			}
+			out = nil
+
+			if now.succeeded {
+				read, err := ioutil.ReadFile(tmp.Name())
+				if err != nil {
+					panic(err)
+				}
+				err = ioutil.WriteFile(u.Filename, []byte(read), 0)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}()
+	}
 
 	q := queue.New()
 
@@ -70,8 +111,6 @@ func (u *Update) Do() error {
 	defer func() {
 		_ = file.Close()
 	}()
-
-	now := state{}
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -143,6 +182,7 @@ func (u *Update) Do() error {
 	for q.Len() > 0 {
 		out.Print(q.Dequeue())
 	}
+	now.succeeded = true
 
 	return nil
 }

@@ -106,7 +106,7 @@ func (u *Update) Do() error {
 	}
 
 	logger.Printf("Filename: \n%v\n", u.Filename)
-	file, err := os.Open(strings.Striu.Filename)
+	file, err := os.Open(u.Filename)
 	if err != nil {
 		return err
 	}

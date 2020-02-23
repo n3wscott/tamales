@@ -3,11 +3,12 @@ package update
 import (
 	"bufio"
 	"fmt"
-	"github.com/n3wscott/tomles/pkg/queue"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/n3wscott/tomles/pkg/queue"
 )
 
 type Update struct {
@@ -104,7 +105,8 @@ func (u *Update) Do() error {
 		logger.Printf("Params: \n%v\n", u)
 	}
 
-	file, err := os.Open(u.Filename)
+	logger.Printf("Filename: \n%v\n", u.Filename)
+	file, err := os.Open(strings.Striu.Filename)
 	if err != nil {
 		return err
 	}

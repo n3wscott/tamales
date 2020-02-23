@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -65,14 +66,14 @@ func addUpdate(topLevel *cobra.Command) {
 		Run: func(cmd *cobra.Command, args []string) {
 			// Build up command.
 			i := &update.Update{
-				Filename: fo.Filename,
+				Filename: strings.TrimSpace(fo.Filename),
 				DryRun:   do.DryRun,
 				Verbose:  vo.Verbose,
 
-				Name:     co.Name,
-				Branch:   co.Branch,
-				Version:  co.Version,
-				Revision: co.Revision,
+				Name:     strings.TrimSpace(co.Name),
+				Branch:   strings.TrimSpace(co.Branch),
+				Version:  strings.TrimSpace(co.Version),
+				Revision: strings.TrimSpace(co.Revision),
 			}
 
 			// Run it.

@@ -85,9 +85,17 @@ func (u *Update) Do() error {
 				if err != nil {
 					panic(err)
 				}
-				err = ioutil.WriteFile(u.Filename, []byte(read), 0)
+				err = ioutil.WriteFile(u.Filename, read, 0)
 				if err != nil {
 					panic(err)
+				}
+				if u.Verbose {
+					logger.Println("Wrote new file:")
+					read, err := ioutil.ReadFile(u.Filename)
+					if err != nil {
+						panic(err)
+					}
+					logger.Println(string(read))
 				}
 			}
 		}()
@@ -102,10 +110,9 @@ func (u *Update) Do() error {
 	u.Name = strings.ToLower(strings.TrimSpace(u.Name))
 
 	if u.Verbose {
-		logger.Printf("Params: \n%v\n", u)
+		logger.Printf("Params: \n%+v\n", u)
 	}
 
-	logger.Printf("Filename: \n%v\n", u.Filename)
 	file, err := os.Open(u.Filename)
 	if err != nil {
 		return err
